@@ -19,7 +19,8 @@ dns_aws_add() {
   fulldomain=$1
   txtvalue=$2
 
-  if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+  if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY"  || [ -z "$AWS_REGION" ]; then
+    AWS_REGION=""
     AWS_ACCESS_KEY_ID=""
     AWS_SECRET_ACCESS_KEY=""
     _err "You don't specify aws route53 api key id and and api key secret yet."
@@ -27,6 +28,7 @@ dns_aws_add() {
     return 1
   fi
 
+  _saveaccountconf AWS_REGION "$AWS_REGION"
   _saveaccountconf AWS_ACCESS_KEY_ID "$AWS_ACCESS_KEY_ID"
   _saveaccountconf AWS_SECRET_ACCESS_KEY "$AWS_SECRET_ACCESS_KEY"
 
@@ -142,7 +144,7 @@ aws_rest() {
   RequestDateOnly="$(echo "$RequestDate" | cut -c 1-8)"
   _debug2 RequestDateOnly "$RequestDateOnly"
 
-  Region="us-east-1"
+  Region="$AWS_REGION"
   Service="route53"
 
   CredentialScope="$RequestDateOnly/$Region/$Service/aws4_request"
